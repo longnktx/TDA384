@@ -138,7 +138,7 @@ class TrainThread extends Thread {
 			releaseOnSensor(16, 7, -1);
 			moveWhenFree(sectionIndex, 13, 7);
 			releaseOnSensor(7, 7, -1);
-			skipSensorsUntil(14, 3, false);
+			//skipSensorsUntil(14, 3, false);
 		} else {
 			tsi.setSwitch(17, 7, DOWN);
 			releaseOnSensor(17, 8, -1);
