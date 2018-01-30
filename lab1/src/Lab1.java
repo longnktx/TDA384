@@ -72,7 +72,7 @@ class TrainThread extends Thread {
       tsi.setSwitch(17, 7, UP);
     }
     else {                                      // Train 2 specific
-      moveWhenFree(sectionIndex, 8, 5);
+      moveWhenFree(sectionIndex, 9, 5);
       releaseOnSensor(8, 8, 1);
       //critical section 1
       moveWhenFree(sectionIndex, 13, 8);
@@ -81,34 +81,30 @@ class TrainThread extends Thread {
 
     //Parallel section
     skipSensorsUntil(19, 9, false);
-    //System.out.println(critSections[sectionIndex + 1]);
 
     if (critSections[sectionIndex + 1].tryAcquire()) {
       // UPPER TRACK
-      //System.out.println("Train: " + id +", taking: " + (sectionIndex +1) + " and going upper track");
       handleParallelSection(14, 9, 10, 9, UP, true);
       // Release parallel section
       releaseOnSensor(3, 9, 1);
     } else {
       // LOWER TRACK
-      //System.out.println("Train: " + id +", not taking: " + (sectionIndex +1) + " and going lower track");
       handleParallelSection(15, 10, 10, 10, DOWN, true);
       sectionIndex++;
       skipSensorsUntil(3,9, true);
     }
-    //System.out.println(critSections[sectionIndex]);
     if (id == 1) {                                // Train 1 specific
       tsi.setSwitch(3, 11, UP);
       releaseOnSensor(3, 12, 1);
-      skipSensorsUntil(15, 13, false);
+      skipSensorsUntil(14, 13, false);
     }
     else {                                        // Train 2 specific
       tsi.setSwitch(3, 11, DOWN);
       releaseOnSensor(4, 11, 1);
-      skipSensorsUntil(15, 11, false);
+      skipSensorsUntil(14, 11, false);
     }
     tsi.setSpeed(id, 0);
-    sleep(1500); //Make sure we stand still before we go back
+    sleep(1000 + (40 * Math.abs(speed))); //Make sure we stand still before we go back
   }
 
 	private void bottomToTopRoute() throws CommandException, InterruptedException {
@@ -125,37 +121,33 @@ class TrainThread extends Thread {
 		}
     //Parallel section
 		skipSensorsUntil(2,11,true);
-    //System.out.println(critSections[sectionIndex - 1]);
     if (critSections[sectionIndex - 1].tryAcquire()) {
 			// UPPER TRACK
-			//System.out.println("Train: " + id +", taking: " + (sectionIndex -1) + " and going upper track");
 			handleParallelSection(5, 9, 10, 9, UP, false);
       // Release parallel section
       releaseOnSensor(16, 9, -1);
 		} else {
 			// LOWER TRACK
-			//System.out.println("Train: " + id +", taking: " + (sectionIndex -1) + " and going lower track");
 			handleParallelSection(4, 10, 10, 10, DOWN, false);
 			sectionIndex--;
 			skipSensorsUntil(16,9, true);
 		}
-    //System.out.println(critSections[sectionIndex]);
 
 		if (id == 1) {
 			tsi.setSwitch(17, 7, UP);
 			releaseOnSensor(16, 7, -1);
 			moveWhenFree(sectionIndex, 13, 7);
 			releaseOnSensor(7, 7, -1);
-			skipSensorsUntil(15, 3, false);
+			skipSensorsUntil(14, 3, false);
 		} else {
 			tsi.setSwitch(17, 7, DOWN);
 			releaseOnSensor(17, 8, -1);
 			moveWhenFree(sectionIndex, 13, 8);
 			releaseOnSensor(8, 6, -1);
-			skipSensorsUntil(15, 5, false);
+			skipSensorsUntil(14, 5, false);
 		}
 		tsi.setSpeed(id, 0);
-		sleep(1500); //Make sure we stand still before we go back
+		sleep(1000 + (40 * Math.abs(speed))); //Make sure we stand still before we go back
 	}
 
 	/**
@@ -176,7 +168,6 @@ class TrainThread extends Thread {
 
 	private void moveWhenFree(int index, int x, int y) throws CommandException, InterruptedException {
 		skipSensorsUntil(x,y,false);
-    //System.out.println("Train: " + id + ", taking: " + index);
 		while (!critSections[index].tryAcquire())
 			tsi.setSpeed(id,0);
 		tsi.setSpeed(id, speed);
@@ -185,7 +176,6 @@ class TrainThread extends Thread {
 	private void releaseOnSensor(int x,int y, int sectionDiff) throws CommandException, InterruptedException {
 		skipSensorsUntil(x,y,true);
 		critSections[sectionIndex].release();
-		//System.out.println("Train: " + id +", releasing: " + sectionIndex);
 		sectionIndex+=sectionDiff;
 	}
 
