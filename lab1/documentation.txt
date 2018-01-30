@@ -1,3 +1,9 @@
+Our program uses a stateful solution, where the trains remembers in which place on the track it is and preforms action after that.
+The two main methods are "topToBottomRoute" and "bottomToTopRoute", as the name tells, they contains sequential actions for how
+to get from one station to another. The both contains some conditional code that depends on which train is in the method. This is
+because they should arrive at different tracks at the station. We use binary semaphores for our critical sections, which ensures
+that there is at max one train in a critical section.
+
 1
 ## Choice of critical sections
 Map. Our critical sections (0,1,2,3) can be seen in the figure below
