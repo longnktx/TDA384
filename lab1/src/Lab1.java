@@ -187,6 +187,10 @@ class TrainThread extends Thread {
         sectionIndex += sectionDiff;
     }
 
+    /**
+     * Switch to most suitable track and release the semaphore
+     * after passing sensor at position x1, y1 then wait to acquire the next semaphore
+     */
     private void handleParallelSection(int x1, int y1, int x2, int y2, int switchDir, boolean fromTopToBottom) throws CommandException, InterruptedException {
         int sectionDiff = 1;
         if (fromTopToBottom) tsi.setSwitch(15, 9, switchDir);
